@@ -4,3 +4,26 @@
 }
 @plugin "flowbite/plugin";
 @import "flowbite";
+html[data-theme="light"] .dark\:bg-gray-800,
+html[data-theme="light"] .dark\:bg-gray-900 {
+  background-color: white !important;
+}
+
+html[data-theme="light"] .dark\:text-white,
+html[data-theme="light"] .dark\:text-gray-100 {
+  color: #1f2937 !important;
+}
+
+html[data-theme="light"] .dark\:border-gray-600,
+html[data-theme="light"] .dark\:border-gray-700 {
+  border-color: #d1d5db !important;
+}
+
+/* Override specific Flowbite components */
+html[data-theme="light"] .dark\:bg-blue-600 {
+  background-color: #3b82f6 !important;
+}
+
+html[data-theme="light"] .dark\:hover\:bg-blue-700:hover {
+  background-color: #1d4ed8 !important;
+}
