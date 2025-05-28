@@ -1,0 +1,4 @@
+ALTER TABLE categories
+    ADD COLUMN parent_id BIGINT NULL
+REFERENCES categories(id)
+ON DELETE SET NULL;
