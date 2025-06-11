@@ -28,6 +28,7 @@ public class UserService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .gender(dto.getGender())
+                .phone(dto.getPhone())
                 .image(dto.getImage())
                 .build();
 

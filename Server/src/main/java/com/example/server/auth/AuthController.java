@@ -33,7 +33,7 @@ public class AuthController {
             throw new IllegalArgumentException("Invalid credentials");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getUsername());
+        String token = jwtTokenProvider.generateToken(user.getEmail());
         return ResponseEntity.ok(token);
     }
 }

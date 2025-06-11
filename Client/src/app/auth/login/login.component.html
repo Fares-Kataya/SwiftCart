@@ -98,10 +98,11 @@
             <button
               type="submit"
               class="submit-button"
-              [disabled]="loginForm.invalid"
+              [disabled]="!email || !password"
             >
               Sign In
             </button>
+            <div *ngIf="errorMsg" class="text-red-600">{{ errorMsg }}</div>
           </form>
 
           <!-- Divider -->

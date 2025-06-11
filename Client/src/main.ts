@@ -2,8 +2,9 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { importProvidersFrom, ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app/app.component';
-
+import { JwtInterceptor } from './app/auth/jwt.interceptor';
 import { LucideAngularModule } from 'lucide-angular';
 import {
   File,
@@ -16,12 +17,19 @@ import {
   Camera,
   Eye,
   EyeOff,
+  CircleUserRound,
+  VenusAndMars,
 } from 'lucide';
 
 const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    // ← register your icons here at the root:
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true,
+    },
     importProvidersFrom(
       LucideAngularModule.pick({
         File,
@@ -34,6 +42,8 @@ const appConfig: ApplicationConfig = {
         Camera,
         Eye,
         EyeOff,
+        CircleUserRound,
+        VenusAndMars,
       })
     ),
   ],

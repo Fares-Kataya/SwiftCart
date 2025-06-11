@@ -1,8 +1,14 @@
 import { AfterViewInit, Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { AuthService, RegisterPayload } from '../auth.service';
 import { initFlowbite } from 'flowbite';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import {
+  RouterOutlet,
+  Router,
+  NavigationEnd,
+  RouterModule,
+} from '@angular/router';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -21,6 +27,7 @@ import { LucideAngularModule } from 'lucide-angular';
     FormsModule,
     ReactiveFormsModule,
     LucideAngularModule,
+    RouterModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
@@ -30,8 +37,13 @@ export class RegisterComponent implements AfterViewInit {
   showPassword = signal(false);
   showConfirmPassword = signal(false);
   registerForm: FormGroup;
+  errorMsg?: string;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router
+  ) {
     this.registerForm = this.fb.group(
       {
         firstName: ['', [Validators.required]],
@@ -53,6 +65,8 @@ export class RegisterComponent implements AfterViewInit {
             ),
           ],
         ],
+        gender: ['', [Validators.required]],
+        image: [''],
         confirmPassword: ['', [Validators.required]],
         agreeToTerms: [false, [Validators.requiredTrue]],
         subscribeNewsletter: [false],
@@ -79,6 +93,18 @@ export class RegisterComponent implements AfterViewInit {
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword.set(!this.showConfirmPassword());
   }
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      // base64-encoded data URL
+      this.registerForm.patchValue({ image: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  }
 
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
     const password = form.get('password');
@@ -93,7 +119,6 @@ export class RegisterComponent implements AfterViewInit {
       return { passwordMismatch: true };
     }
 
-    // Clear password mismatch error if passwords match
     if (confirmPassword?.hasError('passwordMismatch')) {
       const errors = { ...confirmPassword.errors };
       delete errors['passwordMismatch'];
@@ -131,7 +156,12 @@ export class RegisterComponent implements AfterViewInit {
         userType: this.userType(),
       };
       console.log('Registration data:', formData);
-      // Handle registration logic here
+      const payload: RegisterPayload = this.registerForm.value;
+      this.auth.register(payload).subscribe({
+        next: () => this.router.navigate(['/auth/login']),
+        error: (err) =>
+          (this.errorMsg = err.error?.message || 'Registration failed'),
+      });
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.registerForm.controls).forEach((key) => {

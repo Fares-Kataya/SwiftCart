@@ -38,6 +38,9 @@ public class User {
     @Column(length = 10)
     private String gender;
 
+    @Column(length = 20)
+    private String phone;
+
     @Column(name = "image_url", length = 255)
     private String image;
 

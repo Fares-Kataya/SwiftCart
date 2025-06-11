@@ -1,6 +1,7 @@
 package com.example.server.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +17,17 @@ public class JwtTokenProvider {
 
     @Value("${app.jwt.expiration}")
     private long jwtExpirationMs;
+
+    private SecretKey signingKey;
+
+    @jakarta.annotation.PostConstruct // Use jakarta.annotation.PostConstruct if using Spring Boot 3+
+    public void init() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        if (keyBytes.length < 64) {
-            byte[] paddedKey = new byte[64];
-            System.arraycopy(keyBytes, 0, paddedKey, 0, Math.min(keyBytes.length, 64));
-            keyBytes = paddedKey;
-        }
-        return Keys.hmacShaKeyFor(keyBytes);
+        return this.signingKey;
     }
 
     public String generateToken(String username) {

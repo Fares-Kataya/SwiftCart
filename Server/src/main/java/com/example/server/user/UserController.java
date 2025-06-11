@@ -25,6 +25,7 @@ public class UserController {
                 .username(u.getUsername())
                 .email(u.getEmail())
                 .gender(u.getGender())
+                .phone(u.getPhone())
                 .image(u.getImage())
                 .build();
     }
