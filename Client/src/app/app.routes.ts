@@ -4,6 +4,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { HomeComponent } from './home/home.component';
 import { MainComponent } from './main/main.component';
 import { AuthComponent } from './auth/auth.component';
+import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,12 @@ export const routes: Routes = [
           import('./main/main.module').then((m) => m.MainModule),
       },
     ],
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./profile/profile.component').then((c) => c.ProfileComponent),
+    canActivate: [AuthGuard],
   },
   {
     path: 'auth',

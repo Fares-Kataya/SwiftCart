@@ -1,1 +1,95 @@
-<p>profile works!</p>
+<div class="min-h-screen bg-gray-50">
+
+  <div class="max-w-4xl mx-auto px-4 py-8 grid gap-8 md:grid-cols-3">
+    <!-- Sidebar -->
+    <div class="md:col-span-1 bg-white rounded-lg shadow p-6 text-center">
+      <ng-container *ngIf="user() as u">
+        <div class="relative mx-auto w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-lg text-gray-600">
+          {{ u.firstName.charAt(0) }}{{ u.lastName.charAt(0) }}
+        </div>
+        <h2 class="mt-4 text-xl font-semibold">{{ u.firstName }} {{ u.lastName }}</h2>
+        <p class="text-sm text-gray-500">{{ u.email }}</p>
+        <span class="inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {{ u.role || 'Standard' }} Member
+        </span>
+
+        <hr class="my-6">
+
+        <nav class="space-y-2">
+          <button class="w-full flex items-center ... bg-gray-100 cursor-pointer">Profile Info</button>
+          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Order History</button>
+          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Addresses</button>
+          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Payment Methods</button>
+          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Wishlist</button>
+          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Settings</button>
+        </nav>
+      </ng-container>
+    </div>
+
+    <!-- Main content -->
+    <div class="md:col-span-2 bg-white rounded-lg shadow">
+      <!-- Profile tab -->
+      <div *ngIf="activeTab() === 'profile'" class="p-6 space-y-6">
+        <div class="border-b px-6 py-4 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-medium">Personal Information</h3>
+            <p class="text-sm text-gray-500">Update your details</p>
+          </div>
+          <button
+            (click)="toggleEdit()"
+            [ngClass]="isEditing()
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-700 border-gray-300'"
+            class="px-4 py-2 border rounded-md">
+            {{ isEditing() ? 'Save Changes' : 'Edit' }}
+          </button>
+        </div>
+
+        <div class="px-6 py-4">
+          <form [formGroup]="profileForm" class="space-y-4">
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="block text-sm font-medium">First Name</label>
+                <input
+                  formControlName="firstName"
+                  [disabled]="!isEditing()"
+                  class="mt-1 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Last Name</label>
+                <input
+                  formControlName="lastName"
+                  [disabled]="!isEditing()"
+                  class="mt-1 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Email</label>
+              <input
+                type="email"
+                formControlName="email"
+                [disabled]="!isEditing()"
+                class="mt-1 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Phone</label>
+              <input
+                type="tel"
+                formControlName="phone"
+                [disabled]="!isEditing()"
+                class="mt-1 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Security and Preferences tabs omitted for brevity… -->
+    </div>
+  </div>
+</div>

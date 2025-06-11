@@ -21,6 +21,21 @@ export interface UserProfile {
   gender?: string;
   phone?: string;
   image?: string;
+  role?: string;
+}
+export interface UserProfileUpdatePayload {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  gender?: string;
+  phone?: string;
+  image?: string;
+}
+
+export interface UserPasswordUpdatePayload {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 export interface LoginPayload {
   email: string;
@@ -67,5 +82,20 @@ export class AuthService {
     return this.http
       .get<UserProfile>(`${environment.apiUrl}/users/me`)
       .pipe(catchError(() => of(null)));
+  }
+  updateProfile(changes: Partial<UserProfile>): Observable<UserProfile> {
+    return this.http.put<UserProfile>(
+      `${environment.apiUrl}/users/me`,
+      changes
+    );
+  }
+  updatePassword(payload: {
+    currentPassword: string;
+    newPassword: string;
+  }): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/users/me/password`,
+      payload
+    );
   }
 }

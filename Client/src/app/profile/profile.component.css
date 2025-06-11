@@ -1,0 +1,41 @@
+/* Custom styles for the profile page */
+.peer:checked ~ .peer-checked\:bg-blue-600 {
+    background-color: #2563eb;
+  }
+
+  .peer:checked ~ .peer-checked\:after\:translate-x-full::after {
+    transform: translateX(100%);
+  }
+
+  .peer:checked ~ .peer-checked\:after\:border-white::after {
+    border-color: #ffffff;
+  }
+
+  /* Focus styles for accessibility */
+  .peer:focus ~ .peer-focus\:ring-4 {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Transition for toggle switches */
+  .after\:transition-all::after {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Custom input styles */
+  input:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  /* Custom button hover effects */
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Card hover effects */
+  .bg-white:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+  }
