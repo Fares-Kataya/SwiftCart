@@ -131,7 +131,7 @@ Here are some of the main API endpoints provided by the backend:
 
 You can view a live demo of the application here:
 
-[**DEMO**]([https://your-demo-link.com](https://drive.google.com/file/d/1FnheX4uHxcelacLHZeRaY75kHZoUL6xk/view?usp=sharing))
+[**DEMO**](https://drive.google.com/file/d/1FnheX4uHxcelacLHZeRaY75kHZoUL6xk/view?usp=sharing)
 
 ---
 
