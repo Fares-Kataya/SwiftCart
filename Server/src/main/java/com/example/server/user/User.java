@@ -20,10 +20,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 50)
     private String firstName;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 50)
     private String lastName;
 
     @Column(nullable = false, length = 50)
@@ -35,7 +35,7 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(length = 10)
+    @Column(length = 20)
     private String gender;
 
     @Column(length = 20)

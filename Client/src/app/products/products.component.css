@@ -1,0 +1,76 @@
+/*
+ * Removed the conflicting .grid rule.
+ * Tailwind CSS classes in the HTML now control the grid layout.
+ */
+
+ .products-container {
+  display: flex;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.sidebar {
+  flex: 0 0 200px;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+}
+
+.sidebar input,
+.sidebar select {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+}
+
+.listing {
+  flex: 1;
+}
+
+/*
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+  gap: 1rem;
+}
+*/
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 4px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.card img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.card h4 {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.card .price {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+}

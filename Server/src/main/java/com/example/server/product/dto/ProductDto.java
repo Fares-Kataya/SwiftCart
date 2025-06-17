@@ -4,6 +4,7 @@ import lombok.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+// Assuming you have review logic, you'd need imports for it
 
 @Data
 @NoArgsConstructor
@@ -27,11 +28,15 @@ public class ProductDto {
     @NotNull
     private String categoryName;
 
-    @NotBlank @Size(max=255)
+    @NotBlank
     private String imageUrl;
 
     @Min(0)
     private int stock;
+
+    private Double rating;
+    private Long reviewCount;
+    private Boolean isNew;
 
     private Instant createdAt;
     private Instant updatedAt;

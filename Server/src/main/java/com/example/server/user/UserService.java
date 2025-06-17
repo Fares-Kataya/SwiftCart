@@ -1,7 +1,12 @@
 package com.example.server.user;
 
+import com.example.server.exception.BadRequestException;
+import com.example.server.exception.ConflictException;
+import com.example.server.exception.ResourceNotFoundException;
 import com.example.server.user.dto.UserPasswordUpdateDto;
 import com.example.server.user.dto.UserProfileUpdateDto;
+import com.example.server.user.dto.UserRegistrationDto;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,12 +21,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User register(UserDto dto) {
+    public User register(UserRegistrationDto dto) { // <--- MODIFIED THIS LINE
         userRepository.findByEmail(dto.getEmail())
-                .ifPresent(u -> { throw new IllegalArgumentException("Email is already in use"); });
+                .ifPresent(u -> { throw new ConflictException("Email is already in use"); });
 
         userRepository.findByUsername(dto.getUsername())
-                .ifPresent(u -> { throw new IllegalArgumentException("Username is already in use"); });
+                .ifPresent(u -> { throw new ConflictException("Username is already in use"); });
 
         User user = User.builder()
                 .firstName(dto.getFirstName())
@@ -37,13 +42,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     public UserDto updateProfile(String userEmail, UserProfileUpdateDto dto) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userEmail));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userEmail));
 
         if (dto.getFirstName() != null) {
             user.setFirstName(dto.getFirstName());
@@ -53,7 +59,7 @@ public class UserService {
         }
         if (dto.getEmail() != null && !user.getEmail().equals(dto.getEmail())) {
             userRepository.findByEmail(dto.getEmail())
-                    .ifPresent(u -> { throw new IllegalArgumentException("New email is already in use"); });
+                    .ifPresent(u -> { throw new ConflictException("New email is already in use"); });
             user.setEmail(dto.getEmail());
         }
         if (dto.getGender() != null) {
@@ -72,14 +78,14 @@ public class UserService {
 
     public void updatePassword(String userEmail, UserPasswordUpdateDto dto) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userEmail));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userEmail));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid current password");
+            throw new BadRequestException("Invalid current password");
         }
 
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            throw new IllegalArgumentException("New password and confirm password do not match");
+            throw new BadRequestException("New password and confirm password do not match");
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -95,6 +101,7 @@ public class UserService {
                 .gender(u.getGender())
                 .phone(u.getPhone())
                 .image(u.getImage())
+                .role(u.getRole())
                 .build();
     }
 }

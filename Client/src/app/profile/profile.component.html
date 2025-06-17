@@ -1,7 +1,6 @@
 <div class="min-h-screen bg-gray-50">
 
   <div class="max-w-4xl mx-auto px-4 py-8 grid gap-8 md:grid-cols-3">
-    <!-- Sidebar -->
     <div class="md:col-span-1 bg-white rounded-lg shadow p-6 text-center">
       <ng-container *ngIf="user() as u">
         <div class="relative mx-auto w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-lg text-gray-600">
@@ -16,19 +15,47 @@
         <hr class="my-6">
 
         <nav class="space-y-2">
-          <button class="w-full flex items-center ... bg-gray-100 cursor-pointer">Profile Info</button>
-          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Order History</button>
-          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Addresses</button>
-          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Payment Methods</button>
-          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Wishlist</button>
-          <button class="w-full flex items-center ... hover:bg-gray-50 cursor-pointer">Settings</button>
+          <button
+            (click)="setActiveTab('profile')"
+            [ngClass]="activeTab() === 'profile' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Profile Info
+          </button>
+          <button
+            (click)="setActiveTab('orderHistory')"
+            [ngClass]="activeTab() === 'orderHistory' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Order History
+          </button>
+          <button
+            (click)="setActiveTab('addresses')"
+            [ngClass]="activeTab() === 'addresses' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Addresses
+          </button>
+          <button
+            (click)="setActiveTab('payment')"
+            [ngClass]="activeTab() === 'payment' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Payment Methods
+          </button>
+          <button
+            (click)="setActiveTab('wishlist')"
+            [ngClass]="activeTab() === 'wishlist' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Wishlist
+          </button>
+          <button
+            (click)="setActiveTab('settings')"
+            [ngClass]="activeTab() === 'settings' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 text-gray-700'"
+            class="w-full flex items-center px-4 py-2 rounded-md font-medium text-left transition-colors cursor-pointer">
+            Settings
+          </button>
         </nav>
       </ng-container>
     </div>
 
-    <!-- Main content -->
     <div class="md:col-span-2 bg-white rounded-lg shadow">
-      <!-- Profile tab -->
       <div *ngIf="activeTab() === 'profile'" class="p-6 space-y-6">
         <div class="border-b px-6 py-4 flex items-center justify-between">
           <div>
@@ -89,7 +116,26 @@
         </div>
       </div>
 
-      <!-- Security and Preferences tabs omitted for brevity… -->
+      <div *ngIf="activeTab() === 'orderHistory'" class="p-6 space-y-6">
+        <app-order-history></app-order-history>
+      </div>
+
+      <div *ngIf="activeTab() === 'addresses'" class="p-6">
+        <h3 class="text-lg font-medium">Addresses</h3>
+        <p class="text-sm text-gray-500">Manage your shipping and billing addresses.</p>
+        </div>
+      <div *ngIf="activeTab() === 'payment'" class="p-6">
+        <h3 class="text-lg font-medium">Payment Methods</h3>
+        <p class="text-sm text-gray-500">Manage your saved payment methods.</p>
+        </div>
+      <div *ngIf="activeTab() === 'wishlist'" class="p-6">
+        <h3 class="text-lg font-medium">Wishlist</h3>
+        <p class="text-sm text-gray-500">View and manage your wishlist items.</p>
+        </div>
+      <div *ngIf="activeTab() === 'settings'" class="p-6">
+        <h3 class="text-lg font-medium">Settings</h3>
+        <p class="text-sm text-gray-500">Adjust your account settings.</p>
+        </div>
     </div>
   </div>
 </div>

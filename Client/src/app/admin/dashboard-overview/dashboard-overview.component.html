@@ -1,0 +1,120 @@
+<div class="p-6 bg-white shadow-md rounded-lg mx-4 mt-4">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-5 flex justify-between items-center">
+      <div>
+        <div class="text-sm font-medium text-gray-600">Total Revenue</div>
+        <div class="text-3xl font-extrabold text-gray-900">{{ totalRevenue() | currency:'USD':'symbol':'1.2-2' }}</div>
+        <div class="text-xs text-green-600 flex items-center gap-1 mt-1">
+          <lucide-icon name="TrendingUp" class="h-4 w-4" /> +20.1% (30 days)
+        </div>
+      </div>
+      <lucide-icon name="DollarSign" class="h-8 w-8 text-blue-500 opacity-70" />
+    </div>
+
+    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-5 flex justify-between items-center">
+      <div>
+        <div class="text-sm font-medium text-gray-600">Total Orders</div>
+        <div class="text-3xl font-extrabold text-gray-900">{{ totalOrders() | number }}</div>
+        <div class="text-xs text-green-600 flex items-center gap-1 mt-1">
+          <lucide-icon name="TrendingUp" class="h-4 w-4" /> +180.1% (30 days)
+        </div>
+      </div>
+      <lucide-icon name="ShoppingCart" class="h-8 w-8 text-purple-500 opacity-70" />
+    </div>
+
+    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-5 flex justify-between items-center">
+      <div>
+        <div class="text-sm font-medium text-gray-600">Total Customers</div>
+        <div class="text-3xl font-extrabold text-gray-900">{{ totalCustomers() | number }}</div>
+        <div class="text-xs text-green-600 flex items-center gap-1 mt-1">
+          <lucide-icon name="TrendingUp" class="h-4 w-4" /> +19% (30 days)
+        </div>
+      </div>
+      <lucide-icon name="Users" class="h-8 w-8 text-green-500 opacity-70" />
+    </div>
+
+    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-5 flex justify-between items-center">
+      <div>
+        <div class="text-sm font-medium text-gray-600">Products Sold</div>
+        <div class="text-3xl font-extrabold text-gray-900">{{ productsSold() | number }}</div>
+        <div class="text-xs text-red-600 flex items-center gap-1 mt-1">
+          <lucide-icon name="TrendingDown" class="h-4 w-4" /> -201 (30 days)
+        </div>
+      </div>
+      <lucide-icon name="Package" class="h-8 w-8 text-orange-500 opacity-70" />
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-7">
+    <div class="lg:col-span-4 bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+      <div class="p-5 border-b flex justify-between items-center">
+        <h3 class="font-semibold text-lg text-gray-900">Recent Orders</h3>
+        <span class="text-sm text-gray-500">{{ recentOrders().length }} orders this week</span>
+      </div>
+      <div *ngIf="isLoadingDashboard()" class="flex justify-center items-center py-10">
+        <lucide-icon name="Loader" class="w-6 h-6 animate-spin text-blue-600"></lucide-icon>
+        <p class="ml-2 text-gray-600">Loading recent orders...</p>
+      </div>
+      <div *ngIf="errorDashboard()" class="text-red-600 p-4">{{ errorDashboard() }}</div>
+      <div *ngIf="!isLoadingDashboard() && recentOrders().length === 0 && !errorDashboard()" class="p-4 text-center text-gray-500">
+        No recent orders found.
+      </div>
+      <table *ngIf="!isLoadingDashboard() && recentOrders().length > 0" class="w-full text-sm text-gray-700">
+        <thead class="bg-gray-50 uppercase text-xs text-gray-600">
+          <tr>
+            <th class="p-4 text-left rounded-tl-lg">Order ID</th>
+            <th class="p-4 text-left">Customer</th>
+            <th class="p-4 text-left">Status</th>
+            <th class="p-4 text-left">Date</th>
+            <th class="p-4 text-right rounded-tr-lg">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of recentOrders(); trackBy: trackByOrder" class="border-b last:border-b-0 hover:bg-gray-50">
+            <td class="p-4 font-medium text-gray-900">#{{ order.id }}</td>
+            <td class="p-4">
+              {{ order.customerFirstName }} {{ order.customerLastName }}
+              <div class="text-xs text-gray-500">{{ order.userEmail }}</div>
+            </td>
+            <td class="p-4">
+              <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </td>
+            <td class="p-4">{{ order.orderDate | date:'shortDate' }}</td>
+            <td class="p-4 text-right font-semibold">{{ order.totalPrice | currency:'USD':'symbol':'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lg:col-span-3 bg-white border border-gray-200 shadow-sm rounded-lg p-5">
+      <h3 class="font-semibold text-lg text-gray-900 mb-4">Top Products</h3>
+      <div *ngIf="isLoadingDashboard()" class="flex justify-center items-center py-5">
+        <lucide-icon name="Loader" class="w-5 h-5 animate-spin text-blue-600"></lucide-icon>
+        <p class="ml-2 text-gray-600 text-sm">Loading top products...</p>
+      </div>
+      <div *ngIf="errorDashboard()" class="text-red-600 p-2 text-xs">{{ errorDashboard() }}</div>
+      <div *ngIf="!isLoadingDashboard() && topProducts().length === 0 && !errorDashboard()" class="p-4 text-center text-gray-500 text-sm">
+        No top products found.
+      </div>
+      <div class="space-y-4" *ngIf="!isLoadingDashboard() && topProducts().length > 0">
+        <div *ngFor="let p of topProducts()" class="flex justify-between items-center p-3 border border-gray-100 rounded-md bg-gray-50">
+          <div class="flex items-center gap-3">
+            <img [src]="p.imageUrl || 'https://placehold.co/40x40?text=P'" [alt]="p.title" class="h-10 w-10 object-cover rounded-md">
+            <div>
+              <div class="font-medium text-gray-900">{{ p.title }}</div>
+              <div class="text-xs text-gray-500">Stock: {{ p.stock }}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-gray-800 font-semibold">
+            <span>{{ p.price | currency:'USD':'symbol':'1.2-2' }}</span>
+            <lucide-icon name="TrendingUp" class="h-4 w-4 text-green-600"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

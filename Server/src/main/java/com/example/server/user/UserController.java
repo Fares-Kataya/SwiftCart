@@ -1,5 +1,6 @@
 package com.example.server.user;
 
+import com.example.server.exception.ResourceNotFoundException;
 import com.example.server.user.dto.UserDto;
 import com.example.server.user.UserService;
 import com.example.server.user.dto.UserPasswordUpdateDto;
@@ -15,13 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserRepository repo;
     private final UserService userService;
     @GetMapping("/me")
     public UserDto me(Authentication auth) {
         String email = auth.getName();
-        User u = repo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+        User u = userService.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found: " + email));
         return toUserDto(u);
     }
     @PutMapping("/me")
@@ -44,6 +43,7 @@ public class UserController {
 
     private UserDto toUserDto(User u) {
         return UserDto.builder()
+                .id(u.getId())
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .username(u.getUsername())

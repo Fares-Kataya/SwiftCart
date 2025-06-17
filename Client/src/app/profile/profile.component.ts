@@ -1,243 +1,183 @@
-import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
+// src/app/profile/profile.component.ts
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  FormsModule,
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators,
-  AbstractControl,
-  ValidationErrors,
 } from '@angular/forms';
-import { AuthService, UserProfile } from '../auth/auth.service';
-import { Subject, takeUntil } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+
+import { OrderHistoryComponent } from '../order-history/order-history.component';
+
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  role?: string;
+}
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    LucideAngularModule,
+    HttpClientModule,
+    OrderHistoryComponent,
+  ],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css',
+  styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent implements OnInit, OnDestroy {
-  private auth = inject(AuthService);
-  private fb = inject(FormBuilder);
-  private destroy$ = new Subject<void>();
+export class ProfileComponent implements OnInit {
+  user = signal<User | null>(null);
+  activeTab = signal<
+    | 'profile'
+    | 'orderHistory'
+    | 'addresses'
+    | 'payment'
+    | 'wishlist'
+    | 'settings'
+  >('profile');
 
-  user = signal<UserProfile | null>(null);
-  activeTab = signal<'profile' | 'security' | 'preferences'>('profile');
-  isEditing = signal(false);
-  isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
-
+  isEditing = signal<boolean>(false);
   profileForm: FormGroup;
-  passwordForm: FormGroup;
 
-  constructor() {
+  isProfileLoading = signal<boolean>(true);
+  profileError = signal<string | null>(null);
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.profileForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.maxLength(50)]],
-      lastName: ['', [Validators.required, Validators.maxLength(50)]],
+      firstName: [{ value: '', disabled: true }, Validators.required],
+      lastName: [{ value: '', disabled: true }, Validators.required],
       email: [
-        '',
-        [Validators.required, Validators.email, Validators.maxLength(100)],
+        { value: '', disabled: true },
+        [Validators.required, Validators.email],
       ],
-      phone: [
-        '',
-        [Validators.pattern(/^[0-9()+\-\s]*$/), Validators.maxLength(20)],
-      ],
+      phone: [{ value: '', disabled: true }],
     });
+  }
 
-    this.passwordForm = this.fb.group(
-      {
-        currentPassword: ['', [Validators.required]],
-        newPassword: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(8),
-            Validators.pattern(
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/
-            ),
-          ],
-        ],
-        confirmPassword: ['', [Validators.required]],
+  ngOnInit(): void {
+    this.fetchUserProfile();
+  }
+
+  fetchUserProfile(): void {
+    this.isProfileLoading.set(true);
+    this.profileError.set(null);
+
+    const url = `${environment.apiUrl}/users/me`;
+
+    this.http.get<User>(url).subscribe({
+      next: (data) => {
+        this.user.set(data);
+        this.profileForm.patchValue(data);
+        this.profileForm.disable();
+        this.isProfileLoading.set(false);
       },
-      { validators: this.passwordMatchValidator }
-    );
-  }
-
-  ngOnInit() {
-    this.loadUserProfile();
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private loadUserProfile() {
-    this.isLoading.set(true);
-    this.auth
-      .me()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (user) => {
-          this.user.set(user);
-          this.buildProfileForm(user);
-          this.isLoading.set(false);
-        },
-        error: (error) => {
-          console.error('Failed to load user profile:', error);
-          this.errorMessage.set('Failed to load profile. Please try again.');
-          this.isLoading.set(false);
-        },
-      });
-  }
-
-  passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
-    const password = form.get('newPassword');
-    const confirmPassword = form.get('confirmPassword');
-
-    if (!password || !confirmPassword) {
-      return null;
-    }
-
-    if (password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    }
-
-    if (confirmPassword.hasError('passwordMismatch')) {
-      const errors = { ...confirmPassword.errors };
-      delete errors['passwordMismatch'];
-      confirmPassword.setErrors(Object.keys(errors).length > 0 ? errors : null);
-    }
-
-    return null;
-  }
-
-  private buildProfileForm(user: UserProfile | null) {
-    if (!user) {
-      this.profileForm.reset({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-      });
-      return;
-    }
-
-    this.profileForm.patchValue({
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      email: user.email || '',
-      phone: user.phone || '',
+      error: (err) => {
+        console.error('Failed to fetch user profile:', err);
+        this.profileError.set(
+          'Failed to load profile. Please ensure you are logged in and the backend is running.'
+        );
+        this.isProfileLoading.set(false);
+        if (err.status === 401 || err.status === 403) {
+          this.profileError.set('Authentication required. Please log in.');
+        }
+      },
     });
   }
 
-  setActiveTab(tab: 'profile' | 'security' | 'preferences') {
+  setActiveTab(
+    tab:
+      | 'profile'
+      | 'orderHistory'
+      | 'addresses'
+      | 'payment'
+      | 'wishlist'
+      | 'settings'
+  ): void {
     this.activeTab.set(tab);
-    this.errorMessage.set(null);
+    if (tab !== 'profile' && this.isEditing()) {
+      this.isEditing.set(false);
+      this.profileForm.disable();
+      if (this.user()) {
+        this.profileForm.patchValue(this.user()!);
+      }
+    }
   }
 
-  toggleEdit() {
+  toggleEdit(): void {
     if (this.isEditing()) {
-      this.saveProfile();
+      if (this.profileForm.valid) {
+        // No need for currentUser.id check here, as it's not part of the URL anymore
+        // However, keep the currentUser check just to ensure user data is loaded
+        const currentUser = this.user();
+        if (!currentUser) {
+          alert('Cannot save changes: User data not loaded.');
+          return;
+        }
+
+        console.log('Saving profile changes:', this.profileForm.value);
+        // UserProfileUpdateDto usually doesn't include ID, as it's for partial updates
+        // Send only the fields relevant to UserProfileUpdateDto
+        const updatePayload = {
+          firstName: this.profileForm.value.firstName,
+          lastName: this.profileForm.value.lastName,
+          email: this.profileForm.value.email,
+          phone: this.profileForm.value.phone,
+          // Assuming gender and image are also part of UserProfileUpdateDto if they exist in form
+          // gender: this.profileForm.value.gender,
+          // image: this.profileForm.value.image
+        };
+
+        this.isProfileLoading.set(true);
+        this.profileError.set(null);
+
+        // CHANGE THIS LINE: Use /api/users/me instead of /api/users/${currentUser.id}
+        this.http
+          .put<User>(`${environment.apiUrl}/users/me`, updatePayload)
+          .subscribe({
+            next: (response) => {
+              console.log('Profile updated successfully:', response);
+              this.isEditing.set(false);
+              this.profileForm.disable();
+              this.user.set(response); // Update with the response from backend
+              this.isProfileLoading.set(false);
+              alert('Profile updated successfully!');
+            },
+            error: (err) => {
+              console.error('Failed to save profile changes:', err);
+              let errorMessage = 'Failed to save changes. Please try again.';
+              if (err.error && err.error.message) {
+                errorMessage = err.error.message; // Use message from backend (e.g., validation errors)
+              } else if (err.message) {
+                errorMessage = err.message;
+              } else if (err.statusText) {
+                errorMessage = err.statusText;
+              }
+              this.profileError.set(errorMessage);
+              this.isProfileLoading.set(false);
+              alert(errorMessage);
+              // Revert form to previous user data on save error
+              if (currentUser) {
+                this.profileForm.patchValue(currentUser);
+              }
+            },
+          });
+      } else {
+        alert('Please fill in all required fields correctly.');
+        this.profileForm.markAllAsTouched();
+      }
     } else {
       this.isEditing.set(true);
+      this.profileForm.enable();
     }
-  }
-
-  cancelEdit() {
-    this.isEditing.set(false);
-    this.buildProfileForm(this.user());
-    this.errorMessage.set(null);
-  }
-
-  saveProfile() {
-    if (!this.profileForm.valid) {
-      this.markFormGroupTouched(this.profileForm);
-      return;
-    }
-
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-
-    this.auth
-      .updateProfile(this.profileForm.value)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (updated) => {
-          this.user.set(updated);
-          this.isEditing.set(false);
-          this.isLoading.set(false);
-          console.log('Profile updated successfully:', updated);
-        },
-        error: (error) => {
-          console.error('Failed to update profile:', error);
-          this.errorMessage.set('Failed to update profile. Please try again.');
-          this.isLoading.set(false);
-        },
-      });
-  }
-
-  updatePassword() {
-    if (!this.passwordForm.valid) {
-      this.markFormGroupTouched(this.passwordForm);
-      return;
-    }
-
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-
-    this.auth
-      .updatePassword(this.passwordForm.value)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.passwordForm.reset();
-          this.isLoading.set(false);
-          console.log('Password updated successfully');
-        },
-        error: (error) => {
-          console.error('Failed to update password:', error);
-          this.errorMessage.set('Failed to update password. Please try again.');
-          this.isLoading.set(false);
-        },
-      });
-  }
-
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach((key) => {
-      const control = formGroup.get(key);
-      control?.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
-    });
-  }
-
-  signOut() {
-    this.auth.logout();
-  }
-
-  getFieldError(formGroup: FormGroup, fieldName: string): string | null {
-    const field = formGroup.get(fieldName);
-    if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${fieldName} is required`;
-      if (field.errors['email']) return 'Please enter a valid email';
-      if (field.errors['minlength'])
-        return `Minimum length is ${field.errors['minlength'].requiredLength}`;
-      if (field.errors['maxlength'])
-        return `Maximum length is ${field.errors['maxlength'].requiredLength}`;
-      if (field.errors['pattern']) return 'Invalid format';
-      if (field.errors['passwordMismatch']) return 'Passwords do not match';
-    }
-    return null;
-  }
-
-  hasFieldError(formGroup: FormGroup, fieldName: string): boolean {
-    const field = formGroup.get(fieldName);
-    return !!(field && field.errors && field.touched);
   }
 }

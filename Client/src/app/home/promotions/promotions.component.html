@@ -1,57 +1,33 @@
 <div class="flex flex-col gap-2 justify-center items-center">
   <h2 class="text-3xl font-bold">Shop By Category</h2>
   <h3 class="text-lg font-medium text-gray-500">Browse our popular categories</h3>
-  </div>
-<div class="grid grid-cols-4 gap-10 mx-10 mt-5 mb-20">
-<div>
-<div class="card bg-base-100 image-full w-full h-100 shadow-sm transition-transform transition-shadow duration-500 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer">
-  <figure>
-    <img
-      src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-      alt="Shoes" />
-  </figure>
-  <div class="card-body">
-    <h2 class="card-title text-4xl absolute top-80">Fashion</h2>
-  </div>
 </div>
+
+<div *ngIf="categoryService.isLoading()" class="text-center py-10">
+  <span class="loading loading-spinner loading-lg"></span>
+  <p class="mt-2 text-gray-600">Loading categories...</p>
 </div>
-<div>
-  <div class="card bg-base-100 image-full w-full h-100 shadow-sm transition-transform transition-shadow duration-500 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer">
-    <figure>
-      <img
-      class="w-full"
-        src="/categories/Electronics.jpg"
-        alt="Shoes" />
-    </figure>
-    <div class="card-body">
-      <h2 class="card-title text-4xl absolute top-80">Electronics</h2>
+
+<div *ngIf="categoryService.error()" class="text-center py-10 text-red-600">
+  <p>{{ categoryService.error() }}</p>
+  <p>Please try refreshing the page.</p>
+</div>
+
+<div *ngIf="!categoryService.isLoading() && categoryService.categories().length > 0"
+     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mx-10 mt-5 mb-20">
+  <div *ngFor="let category of categoryService.categories(); trackBy: trackByCategory">
+    <div class="card bg-base-100 image-full w-full h-100 shadow-sm transition-transform transition-shadow duration-500 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
+         [routerLink]="['/products']" [queryParams]="{ category: category.name }">
+      <figure>
+        <img [src]="category.imageUrl" [alt]="category.name" class="w-full h-full object-cover"/>
+      </figure>
+      <div class="card-body flex items-end justify-end p-4">
+        <h2 class="card-title text-4xl text-white">{{ category.name }}</h2>
+      </div>
     </div>
   </div>
 </div>
-<div>
-  <div class="card bg-base-100 image-full w-full h-100 shadow-sm transition-transform transition-shadow duration-500 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer">
-    <figure>
-      <img
-      class="w-full"
-        src="/categories/Electronics.jpg"
-        alt="Shoes" />
-    </figure>
-    <div class="card-body">
-      <h2 class="card-title text-4xl absolute top-80">Electronics</h2>
-    </div>
-  </div>
-</div>
-<div>
-  <div class="card bg-base-100 image-full w-full h-100 shadow-sm transition-transform transition-shadow duration-500 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer">
-    <figure>
-      <img
-      class="w-full"
-        src="/categories/appliances.jpg"
-        alt="Shoes" />
-    </figure>
-    <div class="card-body">
-      <h2 class="card-title text-4xl absolute top-80">Appliances</h2>
-    </div>
-  </div>
-</div>
+
+<div *ngIf="!categoryService.isLoading() && categoryService.categories().length === 0 && !categoryService.error()" class="text-center py-10 text-gray-500">
+  <p>No categories found.</p>
 </div>

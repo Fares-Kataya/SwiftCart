@@ -4,6 +4,8 @@ import com.example.server.auth.dto.LoginDto;
 import com.example.server.user.User;
 import com.example.server.user.UserService;
 import com.example.server.user.dto.UserDto;
+import com.example.server.user.dto.UserRegistrationDto;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody UserDto dto) {
+    public ResponseEntity<Void> register(@RequestBody UserRegistrationDto dto) {
         userService.register(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

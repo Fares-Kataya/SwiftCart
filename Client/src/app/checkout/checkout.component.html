@@ -1,0 +1,396 @@
+<div class="min-h-screen bg-gray-50 font-sans">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <a routerLink="/cart" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4 rounded-md p-2 hover:bg-gray-100 transition-colors">
+        <lucide-angular name="ArrowLeft" class="h-4 w-4 mr-2"></lucide-angular>
+        Back to Cart
+      </a>
+      <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="space-y-6">
+        <form (ngSubmit)="handleSubmit()" #checkoutForm="ngForm">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                1
+              </div>
+              Contact Information
+            </h2>
+            <div class="space-y-4">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input id="email" type="email" placeholder="john@example.com" required
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       [(ngModel)]="email" name="email" #emailInput="ngModel">
+                <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-red-500 text-xs mt-1">
+                  <div *ngIf="emailInput.errors?.['required']">Email is required.</div>
+                  <div *ngIf="emailInput.errors?.['email']">Please enter a valid email address.</div>
+                </div>
+              </div>
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input id="phone" type="tel" placeholder="+1 (555) 123-4567"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       [(ngModel)]="phone" name="phone">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                2
+              </div>
+              Shipping Address
+            </h2>
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input id="firstName" placeholder="John" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="shippingAddress.firstName" name="shippingFirstName" #shippingFirstName="ngModel">
+                  <div *ngIf="shippingFirstName.invalid && (shippingFirstName.dirty || shippingFirstName.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="shippingFirstName.errors?.['required']">First Name is required.</div>
+                  </div>
+                </div>
+                <div>
+                  <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input id="lastName" placeholder="Doe" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="shippingAddress.lastName" name="shippingLastName" #shippingLastName="ngModel">
+                  <div *ngIf="shippingLastName.invalid && (shippingLastName.dirty || shippingLastName.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="shippingLastName.errors?.['required']">Last Name is required.</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                <input id="address" placeholder="123 Main Street" required
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       [(ngModel)]="shippingAddress.address" name="shippingAddress" #shippingAddressInput="ngModel">
+                <div *ngIf="shippingAddressInput.invalid && (shippingAddressInput.dirty || shippingAddressInput.touched)" class="text-red-500 text-xs mt-1">
+                  <div *ngIf="shippingAddressInput.errors?.['required']">Street Address is required.</div>
+                </div>
+              </div>
+              <div>
+                <label for="apartment" class="block text-sm font-medium text-gray-700 mb-1">Apartment, suite, etc. (optional)</label>
+                <input id="apartment" placeholder="Apt 4B"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       [(ngModel)]="shippingAddress.apartment" name="shippingApartment">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <input id="city" placeholder="New York" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="shippingAddress.city" name="shippingCity" #shippingCity="ngModel">
+                  <div *ngIf="shippingCity.invalid && (shippingCity.dirty || shippingCity.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="shippingCity.errors?.['required']">City is required.</div>
+                  </div>
+                </div>
+                <div>
+                  <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                  <select id="state"
+                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          [(ngModel)]="shippingAddress.state" name="shippingState" required>
+                    <option value="" disabled selected>Select state</option>
+                    <option value="ny">New York</option>
+                    <option value="ca">California</option>
+                    <option value="tx">Texas</option>
+                    <option value="fl">Florida</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <input id="zipCode" placeholder="10001" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="shippingAddress.zipCode" name="shippingZipCode" #shippingZipCode="ngModel">
+                  <div *ngIf="shippingZipCode.invalid && (shippingZipCode.dirty || shippingZipCode.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="shippingZipCode.errors?.['required']">ZIP Code is required.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                3
+              </div>
+              Shipping Method
+            </h2>
+            <div class="space-y-3" role="radiogroup">
+              <div class="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg cursor-pointer"
+                   [class.bg-blue-50]="shippingMethod === 'standard'"
+                   (click)="onShippingMethodChange('standard')">
+                <input type="radio" id="standard" value="standard" name="shippingMethod"
+                       class="form-radio text-blue-600 h-4 w-4"
+                       [(ngModel)]="shippingMethod" (change)="calculateOrderSummary()">
+                <div class="flex-1">
+                  <label for="standard" class="flex items-center justify-between cursor-pointer">
+                    <div class="flex items-center gap-2">
+                      <lucide-angular name="Truck" class="h-4 w-4"></lucide-angular>
+                      <span>Standard Shipping</span>
+                    </div>
+                    <span class="font-medium">$5.99</span>
+                  </label>
+                  <p class="text-sm text-gray-500 ml-6">5-7 business days</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg cursor-pointer"
+                   [class.bg-blue-50]="shippingMethod === 'express'"
+                   (click)="onShippingMethodChange('express')">
+                <input type="radio" id="express" value="express" name="shippingMethod"
+                       class="form-radio text-blue-600 h-4 w-4"
+                       [(ngModel)]="shippingMethod" (change)="calculateOrderSummary()">
+                <div class="flex-1">
+                  <label for="express" class="flex items-center justify-between cursor-pointer">
+                    <div class="flex items-center gap-2">
+                      <lucide-angular name="Truck" class="h-4 w-4"></lucide-angular>
+                      <span>Express Shipping</span>
+                    </div>
+                    <span class="font-medium">$15.99</span>
+                  </label>
+                  <p class="text-sm text-gray-500 ml-6">2-3 business days</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg cursor-pointer"
+                   [class.bg-blue-50]="shippingMethod === 'overnight'"
+                   (click)="onShippingMethodChange('overnight')">
+                <input type="radio" id="overnight" value="overnight" name="shippingMethod"
+                       class="form-radio text-blue-600 h-4 w-4"
+                       [(ngModel)]="shippingMethod" (change)="calculateOrderSummary()">
+                <div class="flex-1">
+                  <label for="overnight" class="flex items-center justify-between cursor-pointer">
+                    <div class="flex items-center gap-2">
+                      <lucide-angular name="Truck" class="h-4 w-4"></lucide-angular>
+                      <span>Overnight Shipping</span>
+                    </div>
+                    <span class="font-medium">$29.99</span>
+                  </label>
+                  <p class="text-sm text-gray-500 ml-6">Next business day</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                4
+              </div>
+              Billing Address
+            </h2>
+            <div class="space-y-4">
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="sameAsShipping"
+                       class="form-checkbox h-4 w-4 text-blue-600"
+                       [(ngModel)]="sameAsShipping" name="sameAsShippingCheckbox"
+                       (change)="onSameAsShippingChange(sameAsShipping)">
+                <label for="sameAsShipping" class="text-sm font-medium text-gray-700">Same as shipping address</label>
+              </div>
+
+              <ng-container *ngIf="!sameAsShipping">
+                <div class="space-y-4 pt-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label for="billingFirstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                      <input id="billingFirstName" placeholder="John" required
+                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                             [(ngModel)]="billingAddress.firstName" name="billingFirstName" #billingFirstName="ngModel">
+                      <div *ngIf="billingFirstName.invalid && (billingFirstName.dirty || billingFirstName.touched)" class="text-red-500 text-xs mt-1">
+                        <div *ngIf="billingFirstName.errors?.['required']">First Name is required.</div>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="billingLastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                      <input id="billingLastName" placeholder="Doe" required
+                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                             [(ngModel)]="billingAddress.lastName" name="billingLastName" #billingLastName="ngModel">
+                      <div *ngIf="billingLastName.invalid && (billingLastName.dirty || billingLastName.touched)" class="text-red-500 text-xs mt-1">
+                        <div *ngIf="billingLastName.errors?.['required']">Last Name is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="billingAddress" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                    <input id="billingAddress" placeholder="123 Main Street" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           [(ngModel)]="billingAddress.address" name="billingAddress" #billingAddressInput="ngModel">
+                    <div *ngIf="billingAddressInput.invalid && (billingAddressInput.dirty || billingAddressInput.touched)" class="text-red-500 text-xs mt-1">
+                      <div *ngIf="billingAddressInput.errors?.['required']">Street Address is required.</div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label for="billingCity" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                      <input id="billingCity" placeholder="New York" required
+                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                             [(ngModel)]="billingAddress.city" name="billingCity" #billingCity="ngModel">
+                      <div *ngIf="billingCity.invalid && (billingCity.dirty || billingCity.touched)" class="text-red-500 text-xs mt-1">
+                        <div *ngIf="billingCity.errors?.['required']">City is required.</div>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="billingState" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                      <select id="billingState"
+                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                              [(ngModel)]="billingAddress.state" name="billingState" required>
+                        <option value="" disabled selected>Select state</option>
+                        <option value="ny">New York</option>
+                        <option value="ca">California</option>
+                        <option value="tx">Texas</option>
+                        <option value="fl">Florida</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="billingZipCode" class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                      <input id="billingZipCode" placeholder="10001" required
+                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                             [(ngModel)]="billingAddress.zipCode" name="billingZipCode" #billingZipCode="ngModel">
+                      <div *ngIf="billingZipCode.invalid && (billingZipCode.dirty || billingZipCode.touched)" class="text-red-500 text-xs mt-1">
+                        <div *ngIf="billingZipCode.errors?.['required']">ZIP Code is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                5
+              </div>
+              Payment Method
+            </h2>
+            <div class="space-y-3" role="radiogroup">
+              <div class="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg cursor-pointer"
+                   [class.bg-blue-50]="paymentMethod === 'card'"
+                   (click)="onPaymentMethodChange('card')">
+                <input type="radio" id="card" value="card" name="paymentMethod"
+                       class="form-radio text-blue-600 h-4 w-4"
+                       [(ngModel)]="paymentMethod">
+                <label for="card" class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                  <lucide-angular name="CreditCard" class="h-4 w-4"></lucide-angular>
+                  Credit or Debit Card
+                </label>
+              </div>
+              </div>
+
+            <ng-container *ngIf="paymentMethod === 'card'">
+              <div class="space-y-4 pt-4">
+                <div>
+                  <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                  <input id="cardNumber" placeholder="1234 5678 9012 3456" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="cardDetails.cardNumber" name="cardNumber" #cardNumber="ngModel">
+                  <div *ngIf="cardNumber.invalid && (cardNumber.dirty || cardNumber.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="cardNumber.errors?.['required']">Card Number is required.</div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                    <input id="expiryDate" placeholder="MM/YY" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           [(ngModel)]="cardDetails.expiryDate" name="expiryDate" #expiryDate="ngModel">
+                    <div *ngIf="expiryDate.invalid && (expiryDate.dirty || expiryDate.touched)" class="text-red-500 text-xs mt-1">
+                      <div *ngIf="expiryDate.errors?.['required']">Expiry Date is required.</div>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                    <input id="cvv" placeholder="123" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           [(ngModel)]="cardDetails.cvv" name="cvv" #cvv="ngModel">
+                    <div *ngIf="cvv.invalid && (cvv.dirty || cvv.touched)" class="text-red-500 text-xs mt-1">
+                      <div *ngIf="cvv.errors?.['required']">CVV is required.</div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label for="cardName" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+                  <input id="cardName" placeholder="John Doe" required
+                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         [(ngModel)]="cardDetails.cardName" name="cardName" #cardName="ngModel">
+                  <div *ngIf="cardName.invalid && (cardName.dirty || cardName.touched)" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="cardName.errors?.['required']">Name on Card is required.</div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <div class="flex items-center gap-2 text-sm text-gray-600 mt-4">
+              <lucide-angular name="Lock" class="h-4 w-4"></lucide-angular>
+              <span>Your payment information is secure and encrypted</span>
+            </div>
+          </div>
+
+          <button type="submit"
+                  class="w-full mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  [disabled]="checkoutForm.invalid">
+            <lucide-angular name="Lock" class="h-4 w-4"></lucide-angular>
+            Place Order • ${{ total.toFixed(2) }}
+          </button>
+          <p class="text-xs text-gray-500 text-center mt-4">
+            By placing your order, you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </form>
+      </div>
+
+      <div class="lg:sticky lg:top-8 lg:h-fit">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+          <div class="space-y-4">
+            <div class="space-y-4">
+              <div *ngFor="let item of cartService.cartItems(); trackBy: trackByCartItem" class="flex items-center gap-4">
+                <div class="relative">
+                  <img [src]="item.imageUrl || 'https://placehold.co/60x60?text=Product'" [alt]="item.title"
+                       class="w-16 h-16 rounded-lg object-cover">
+                  <span class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center p-0">
+                    {{item.quantity}}
+                  </span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-medium text-sm truncate">{{item.title}}</h4>
+                  <p class="text-sm text-gray-500">
+                    {{item.color}} • {{item.size}}
+                  </p>
+                </div>
+                <div class="text-sm font-medium">${{(item.price * item.quantity).toFixed(2)}}</div>
+              </div>
+            </div>
+
+            <hr class="my-4 border-t border-gray-200">
+
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span>${{subtotal.toFixed(2)}}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span>Shipping</span>
+                <span>${{shipping.toFixed(2)}}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span>Tax</span>
+                <span>${{tax.toFixed(2)}}</span>
+              </div>
+              <hr class="my-4 border-t border-gray-200">
+              <div class="flex justify-between font-medium text-lg">
+                <span>Total</span>
+                <span>${{total.toFixed(2)}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

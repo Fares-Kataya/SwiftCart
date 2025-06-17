@@ -1,0 +1,26 @@
+<div class="min-h-screen bg-gray-50 font-sans flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8 text-center">
+    <div class="flex flex-col items-center justify-center mb-6">
+      <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+        <lucide-angular name="CheckCircle" class="h-10 w-10 text-green-600"></lucide-angular>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
+      <p class="text-gray-600 text-lg">Your order has been placed successfully.</p>
+    </div>
+
+    <div class="mb-8">
+      <p class="text-gray-500 text-sm">
+        We've sent a confirmation email to your provided address.
+      </p>
+      <p class="text-gray-500 text-sm mt-2">
+        You will be redirected to the home page in **{{ countdown }}** seconds.
+      </p>
+    </div>
+
+    <button (click)="goToHome()"
+            class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+      <lucide-angular name="Home" class="h-4 w-4"></lucide-angular>
+      Go to Home Page
+    </button>
+  </div>
+</div>

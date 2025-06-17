@@ -1,0 +1,42 @@
+<aside class="w-64 bg-white border-r shadow-md flex flex-col rounded-r-lg">
+  <!-- Logo/Header -->
+  <div class="p-5 border-b flex items-center justify-center rounded-tr-lg">
+    <a routerLink="/admin/dashboard" class="flex items-center gap-2 text-blue-800 hover:text-blue-900 transition-colors">
+      <div class="p-2 bg-blue-600 text-white rounded-lg">
+        <lucide-icon name="Store" class="h-6 w-6"></lucide-icon>
+      </div>
+      <div>
+        <div class="font-bold text-xl">SwiftCart Admin</div>
+        <div class="text-xs text-gray-500">Dashboard</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="flex-1 p-4 space-y-2">
+    <div class="uppercase text-xs text-gray-400 mb-2 px-2">Main Navigation</div>
+    <ul class="space-y-1">
+      <li *ngFor="let item of navigationItems">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-blue-100 text-blue-800 font-semibold shadow-sm"
+          class="flex items-center gap-3 p-3 rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+        >
+          <lucide-icon [name]="item.icon" class="h-5 w-5"></lucide-icon>
+          <span>{{ item.title }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer / Admin Info (Optional) -->
+  <div class="p-4 border-t mt-auto rounded-br-lg">
+    <div class="flex items-center gap-3">
+      <img src="https://placehold.co/40x40/cbd5e1/475569?text=AD" class="h-10 w-10 rounded-full object-cover shadow" alt="Admin Avatar" />
+      <div>
+        <div class="font-semibold text-gray-800">Admin User</div>
+        <div class="text-xs text-gray-500">admin.com</div>
+      </div>
+    </div>
+  </div>
+</aside>

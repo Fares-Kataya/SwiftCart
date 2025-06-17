@@ -1,0 +1,72 @@
+<div class="border-b px-6 py-4 flex items-center justify-between">
+  <div>
+    <h3 class="text-lg font-medium">Order History</h3>
+    <p class="text-sm text-gray-500">View your past orders and their details.</p>
+  </div>
+</div>
+
+<div class="p-6 space-y-6">
+  <div *ngIf="isLoading()" class="flex justify-center items-center h-48">
+    <lucide-angular name="Loader" class="w-8 h-8 animate-spin text-blue-600"></lucide-angular>
+    <p class="ml-2 text-gray-600">Loading orders...</p>
+  </div>
+
+  <div *ngIf="error()" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+    <strong class="font-bold">Error!</strong>
+    <span class="block sm:inline ml-2">{{ error() }}</span>
+  </div>
+
+  <div *ngIf="!isLoading() && !orders().length && !error()" class="text-center py-10">
+    <lucide-angular name="ShoppingCart" class="w-16 h-16 mx-auto text-gray-400 mb-4"></lucide-angular>
+    <p class="text-gray-600">You haven't placed any orders yet.</p>
+  </div>
+
+  <div *ngIf="!isLoading() && orders().length > 0" class="space-y-6">
+    <div *ngFor="let order of orders(); trackBy: trackByOrder" class="border rounded-lg shadow-sm overflow-hidden">
+      <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center"> <div class="flex flex-wrap items-center text-sm font-medium text-gray-700">
+          <div class="mb-2 mr-4 sm:mb-0">
+            <span class="block text-xs text-gray-500">Order ID:</span>
+            <span class="font-semibold text-gray-800">#{{ order.id }}</span>
+          </div>
+          <div class="mb-2 mr-4 sm:mb-0">
+            <span class="block text-xs text-gray-500">Order Date:</span>
+            <span class="font-semibold text-gray-800">{{ order.orderDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="mb-2 mr-4 sm:mb-0">
+            <span class="block text-xs text-gray-500">Total:</span>
+            <span class="font-semibold text-gray-800">${{ order.totalPrice | number:'1.2-2' }}</span>
+          </div>
+          <div>
+            <span class="block text-xs text-gray-500">Status:</span>
+            <span [ngClass]="{
+              'text-yellow-600 bg-yellow-100': order.status === 'PENDING',
+              'text-green-600 bg-green-100': order.status === 'CONFIRMED' || order.status === 'DELIVERED',
+              'text-blue-600 bg-blue-100': order.status === 'SHIPPED',
+              'text-red-600 bg-red-100': order.status === 'CANCELLED'
+            }" class="px-2.5 py-0.5 rounded-full text-xs font-medium uppercase">
+              {{ order.status }}
+            </span>
+          </div>
+        </div>
+        <button
+          *ngIf="order.status === 'PENDING'"
+          (click)="cancelOrder(order.id)"
+          class="ml-4 px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Cancel Order
+        </button>
+      </div>
+
+      <div class="p-6">
+        <h4 class="text-sm font-semibold text-gray-700 mb-3">Items:</h4>
+        <div class="space-y-3">
+          <div *ngFor="let item of order.items; trackBy: trackByOrderItem" class="flex items-center text-sm text-gray-600">
+            <span class="font-medium flex-1">Product ID: {{ item.productId }}</span>
+            <span class="ml-4">Qty: {{ item.quantity }}</span>
+            <span class="ml-4 font-semibold">${{ item.unitPrice | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

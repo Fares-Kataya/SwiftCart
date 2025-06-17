@@ -21,7 +21,7 @@ public class Category {
     @Column(nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "image_url", length = 255)
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

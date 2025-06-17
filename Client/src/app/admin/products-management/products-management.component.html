@@ -1,0 +1,183 @@
+<div class="p-6 bg-white shadow-md rounded-lg mx-4 mt-4">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6">Products Management</h1>
+
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+    <div class="flex items-center gap-4 flex-grow">
+      <div class="relative flex-grow">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearchChange()"
+               placeholder="Search products by title..."
+               class="pl-10 pr-4 py-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <lucide-icon name="Search" class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"></lucide-icon>
+      </div>
+
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryFilterChange()"
+              class="px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option [ngValue]="null">All Categories</option>
+        <option *ngFor="let categoryName of allCategoryNames()" [ngValue]="categoryName">{{ categoryName }}</option>
+      </select>
+
+      <select [(ngModel)]="sortBy" (change)="onSortChange()"
+              class="px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="newest">Newest</option>
+        <option value="priceAsc">Price: Low to High</option>
+        <option value="priceDesc">Price: High to Low</option>
+      </select>
+    </div>
+
+    <button (click)="addProduct()"
+            class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2">
+      <lucide-icon name="Plus" class="h-5 w-5"></lucide-icon>
+      Add Product
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="flex justify-center items-center py-10">
+    <lucide-icon name="Loader" class="w-8 h-8 animate-spin text-blue-600"></lucide-icon>
+    <p class="ml-3 text-lg text-gray-600">Loading products...</p>
+  </div>
+
+  <div *ngIf="error()" class="text-red-600 p-4 text-center border border-red-300 bg-red-50 rounded-md">
+    <lucide-icon name="AlertCircle" class="inline-block mr-2"></lucide-icon>
+    {{ error() }}
+  </div>
+
+  <div *ngIf="!isLoading() && products().length === 0 && !error()" class="p-8 text-center text-gray-500">
+    <lucide-icon name="FileText" class="w-12 h-12 mx-auto mb-4"></lucide-icon>
+    <p class="text-lg">No products found matching your criteria.</p>
+    <p class="text-sm">Try adjusting your search or filters.</p>
+  </div>
+
+  <div *ngIf="!isLoading() && products().length > 0" class="overflow-x-auto bg-white border border-gray-200 rounded-lg shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+      <thead class="bg-gray-50 uppercase text-xs text-gray-600">
+        <tr>
+          <th class="px-6 py-3 text-left font-medium">Image</th>
+          <th class="px-6 py-3 text-left font-medium">Title</th>
+          <th class="px-6 py-3 text-left font-medium">Category</th>
+          <th class="px-6 py-3 text-right font-medium">Price</th>
+          <th class="px-6 py-3 text-center font-medium">Stock</th>
+          <th class="px-6 py-3 text-center font-medium">Rating</th>
+          <th class="px-6 py-3 text-left font-medium">Created At</th>
+          <th class="px-6 py-3 text-center font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let product of products(); trackBy: trackByProduct" class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <img [src]="product.imageUrl || 'https://placehold.co/40x40?text=Product'" [alt]="product.title" class="w-10 h-10 object-cover rounded-md">
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="font-medium text-gray-900">{{ product.title }}</div>
+            <div class="text-gray-500 line-clamp-1 max-w-xs">{{ product.description }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ product.categoryName }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right font-semibold">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">{{ product.stock }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            <span *ngIf="product.rating !== null && product.rating !== undefined">
+              {{ product.rating | number:'1.1-1' }} <span class="text-yellow-500">★</span> ({{ product.reviewCount || 0 }})
+            </span>
+            <span *ngIf="product.rating === null || product.rating === undefined" class="text-gray-400">N/A</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ product.createdAt | date:'shortDate' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button (click)="editProduct(product.id!)" class="text-blue-600 hover:text-blue-900" title="Edit">
+                <lucide-icon name="Edit" class="w-5 h-5"></lucide-icon>
+              </button>
+              <button (click)="deleteProduct(product.id!)" class="text-red-600 hover:text-red-900" title="Delete">
+                <lucide-icon name="Trash2" class="w-5 h-5"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav *ngIf="totalPages.length > 1" class="flex justify-center items-center gap-2 mt-6">
+    <button (click)="onPageChange(currentPage() - 1)" [disabled]="currentPage() === 1"
+            class="px-4 py-2 border rounded-md text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+      Previous
+    </button>
+    <button *ngFor="let page of totalPages" (click)="onPageChange(page)"
+            [class]="{'bg-blue-600 text-white': currentPage() === page, 'bg-white text-gray-700 hover:bg-gray-100': currentPage() !== page}"
+            class="px-4 py-2 border rounded-md">
+      {{ page }}
+    </button>
+    <button (click)="onPageChange(currentPage() + 1)" [disabled]="currentPage() === totalPages.length"
+            class="px-4 py-2 border rounded-md text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+      Next
+    </button>
+  </nav>
+</div>
+
+<div *ngIf="isFormVisible()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-3xl transform transition-all duration-300 scale-95 animate-fade-in-up">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ currentProduct().isNew ? 'Add New Product' : 'Edit Product' }}</h2>
+
+    <form (ngSubmit)="saveProduct()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <input type="text" id="title" name="title" [(ngModel)]="currentProduct().title" required
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+          <input type="number" id="price" name="price" [(ngModel)]="currentProduct().price" required step="0.01" min="0.01"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea id="description" name="description" [(ngModel)]="currentProduct().description" rows="3" required
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <select id="category" name="category" [(ngModel)]="currentProduct().categoryId" required
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option [ngValue]="0" disabled>Select a category</option>
+            <option *ngFor="let cat of allCategories()" [ngValue]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+          <input type="number" id="stock" name="stock" [(ngModel)]="currentProduct().stock" required min="0"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+        <input type="url" id="imageUrl" name="imageUrl" [(ngModel)]="currentProduct().imageUrl" required
+               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+      </div>
+
+      <div *ngIf="currentProduct().imageUrl" class="flex justify-center mt-4">
+        <img [src]="currentProduct().imageUrl" alt="Product Image Preview" class="max-h-48 object-contain rounded-md border border-gray-200 p-2">
+      </div>
+
+      <div *ngIf="formError()" class="text-red-600 p-3 border border-red-300 bg-red-50 rounded-md text-sm">
+        <lucide-icon name="AlertCircle" class="inline-block mr-2 h-4 w-4"></lucide-icon>
+        {{ formError() }}
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" (click)="cancelEdit()"
+                class="px-5 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="isSaving()"
+                class="px-5 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <lucide-icon *ngIf="isSaving()" name="Loader" class="h-5 w-5 animate-spin"></lucide-icon>
+          {{ isSaving() ? 'Saving...' : (currentProduct().id ? 'Update Product' : 'Add Product') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

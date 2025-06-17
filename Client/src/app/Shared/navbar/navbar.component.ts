@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { of, Subscription } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
+import { CartService, CartProduct } from '../../services/cart.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,9 +18,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   user = signal<UserProfile | null>(null);
   isLoading = signal<boolean>(false);
 
-  private subscriptions = new Subscription();
+  private subscriptions = new Subscription(); // Still needed for AuthService subscriptions
 
-  constructor(private auth: AuthService) {}
+  // Inject CartService and make it public so template can access its signals
+  constructor(private auth: AuthService, public cartService: CartService) {}
 
   ngOnInit() {
     const tokenSub = this.auth.token$
@@ -50,8 +52,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(tokenSub);
   }
 
+  // Use CartProduct from the service
+  trackByCartItem(index: number, item: CartProduct): number {
+    return item.id;
+  }
+
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  // Changed from removeFromCart to removeItem to match CartService
+  removeItem(productId: number) {
+    this.cartService.removeItem(productId); // Delegate to CartService
+    // Toast messages are handled by CartService directly
   }
 
   logout() {
